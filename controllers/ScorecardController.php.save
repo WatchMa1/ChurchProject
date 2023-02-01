@@ -1,0 +1,141 @@
+<?php
+
+
+namespace app\controllers;
+
+use Yii;
+use yii\web\Controller;
+use yii\helpers\ArrayHelper;
+use kartik\grid\EditableColumnAction;
+
+use app\models\User;
+use app\models\KPI;
+use app\models\Department;
+use app\models\Initiative;
+use app\models\ResourcePerson;
+use app\models\StrategicTheme;
+use app\models\InitiativeSearch;
+use app\models\ResponsiblePerson;
+use app\models\StrategicObjective;
+
+
+class ScorecardController extends Controller
+{
+  
+    
+    public function actions(){
+        return ArrayHelper::merge(parent::actions(), [
+           'editInitiative' => [                                       // identifier for your editable column action
+               'class' => EditableColumnAction::className(),     // action class name
+               'modelClass' => Initiative::className(),                // the model for the record being edited
+               'outputValue' => function ($model, $attribute, $key, $index) {
+                     return (int) $model->$attribute / 100;      // return any custom output value if desired
+               },
+               'outputMessage' => function($model, $attribute, $key, $index) {
+                    
+                    if($model->save()){
+                        return 'Input saved';  
+                    }else
+                        return 'Not saved';
+               },
+               'showModelErrors' => true,                        // show model validation errors after save
+               'errorOptions' => ['header' => '']               
+           ],
+            
+            'editKpi' => [                                          'outputMessage' => function($model, $attribute, $key, $index) {
+                    $kpi = KPI::findOne(['id' => $model->kpi]);
+                    $posted = current($_POST['kpi']);
+                    $post = ['kpi' => $posted];
+                    if($model->load($post)){
+                        $kpi->measure = $post;
+                        if($kpi->save()){
+                            return 'Input Saved';
+                        }
+                            return 'Input not Saved';
+                    }
+                }
+            ],
+       ]);
+    }
+    
+    
+	public function actionIndex2(){
+		$session = Yii::$app->session;
+		$department = $session['department'];
+        $department = Department::findOne(['id' => $department]);
+		
+		
+		if(User::userIsAllowedTo('Manage Department') || $department->name == 'SPMEC'){
+			$searchModel = new InitiativeSearch();
+			$initiatives = Initiative::find()->asArray()->all();
+			
+			if(!empty($initiatives)){
+				//var_dump($KPIs);
+				//$this->layout = 'main2';
+				return $this->render('index',[ 
+                    'initiatives' => $initiatives,
+                    'department' => $department,
+                    'searchModel' => $searchModel,
+                    'themes' => $themes_data,
+                    ]);
+			}
+			Yii::$app->session->setFlash('error', 'The score card is still blank. No department has created a scorecard yet.');
+            return $this->redirect('/cms/web/department');
+		}
+		Yii::$app->session->setFlash('error', 'Sorry, you are not authorised to perform this action.');
+        return $this->redirect('/cms/web/index');
+	}
+    
+    
+    
+    public function actionIndex()
+    {
+		$session = Yii::$app->session;
+        
+		if (User::userIsAllowedTo('Manage Department')) {
+            $department = $session['department'];
+            $department = Department::findOne(['id' => $department]);
+       
+            $searchModel = new InitiativeSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $dataProvider->query->andWhere('department_id = '. $department->id);
+            
+            $strategic_themes = StrategicTheme::findAll(['status' => 9]);
+            $themes_data = [];
+            $i = 0;
+            foreach($strategic_themes as $theme){
+                $themes_data[$i] = [$theme->id => $theme->theme];
+                $i = $i + 1;       
+            }
+            
+            $strategic_objectives = StrategicObjective::findAll(['department' => $department->id]);
+            $KPIs = KPI::findAll(['department' => $department->id]);
+            
+			if(!empty($strategic_objectives)){
+				if(!empty($KPIs)){
+					if(!empty($dataProvider)){
+						return $this->render('index',[ 
+							//'initiatives' => $initiatives,
+							'department' => $department,
+							'searchModel' => $searchModel,
+                            'themes' => $themes_data,
+                            'dataProvider' => $dataProvider,
+							//'scorecard' => array_merge($resource_persons, $responsible_persons, $initiatives, $strategic_objectives, $KPIs, $department, $strategic_themes)
+						]);
+					}
+					Yii::$app->session->setFlash('error', 'You have not yet added initiatives to the scorecard. Please add some to complete the scorecard.');
+					return $this->redirect(['initiative']);
+				}
+				Yii::$app->session->setFlash('error', 'You have not yet added measures to the scorecard. Please add create a KPI to complete the scorecard.');
+				return $this->redirect(['kpi/index']);
+	}
+
+            Yii::$app->session->setFlash('error', 'The score card is still blank. Create an Objective to start filling in the score card.');
+            return $this->redirect(['strategic-objective/']);
+            
+        } 
+		Yii::$app->session->setFlash('error', 'You are not allowed to perform this action.');
+        return $this->goHome();
+    }
+}
+?>
