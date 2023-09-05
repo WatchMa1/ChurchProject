@@ -47,7 +47,7 @@ class Initiative extends \yii\db\ActiveRecord
     {
         return [
             [['activity', 'strategic_theme', 'start_date', 'end_date', 'budget', 'comments', 'kpi', 'strategic_objective', 'department_id', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'required'],
-            [['start_date', 'end_date', 'responsible_person', 'strategic_theme', 'kpi',  ], 'safe'],
+            [['start_date', 'end_date', 'responsible_person', 'strategic_theme', 'kpi',], 'safe'],
             [['budget', 'department_id', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'integer'],
             [['activity'], 'string', 'max' => 255],
             [['comments'], 'string', 'max' => 500],
@@ -83,8 +83,8 @@ class Initiative extends \yii\db\ActiveRecord
             'strategic_theme' => 'Strategic Theme',
         ];
     }
-    
-         public function behaviors()
+
+    public function behaviors()
     {
         return [
             'timestamp' => [
@@ -126,13 +126,10 @@ class Initiative extends \yii\db\ActiveRecord
     {
         return $this->hasOne(KPI::className(), ['id' => 'kpi']);
     }
-    
-    
-    public function getKpi()
-    {
-        return $this->hasOne(KPI::className(), ['id' => 'kpi']);
-    }
-    
+
+
+
+
     /**
      * Gets query for [[StrategicObjectives]].
      *
@@ -142,8 +139,8 @@ class Initiative extends \yii\db\ActiveRecord
     {
         return $this->hasOne(StrategicObjective::className(), ['id' => 'strategic_objective']);
     }
-    
-    
+
+
     public function getStrategicTheme()
     {
         return $this->hasOne(StrategicTheme::className(), ['id' => 'strategic_theme']);
@@ -158,7 +155,7 @@ class Initiative extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'updated_by']);
     }
 
- 
+
     /**
      * Gets query for [[ResponsiblePeople]].
      *

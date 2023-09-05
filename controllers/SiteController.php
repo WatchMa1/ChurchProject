@@ -71,34 +71,34 @@ class SiteController extends Controller
     public function actionIndex()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->redirect(['home/index']);
         }
+
         $this->layout = 'login';
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post())) {
-            
+
             $user = User::findByEmail($model->email);
-            if(!empty($user) && $user->status == 9){
-                if(User::checkPassword($user, $model->password)){
+            if (!empty($user) && $user->status == 9) {
+                if (User::checkPassword($user, $model->password)) {
                     $model->login();
                     $session = Yii::$app->session;
                     $session['name'] = $user->getFullName();
                     $session['user'] = $user->id;
                     $member = Member::findOne(['created_by' => $user->id]);
-                    if(!empty($member)) {
+                    if (!empty($member)) {
                         $session['member'] = $member->id;
                     }
                     $family = Family::findOne(['created_by' => $user->id]);
-                    if(!empty($family)) {
+                    if (!empty($family)) {
                         $session['family'] = $family->id;
                     }
-                    
-                    
+
                     $rolestatus = RoleStatus::findOne(['user' => $user->id]);
                     if(!empty($rolestatus)){
-                        $session['role'] = Role::findOne(['id' => $rolestatus->role])->name;
-                        $session['id'] = $rolestatus->role;
-                        $rightstatuses = RightStatus::findAll(['role' => $rolestatus->role]);
+                        $session['role'] = $user->role;
+                        
+                        $rightstatuses = RightStatus::findAll(['role' => $user->role]);
                         
                         $i = 0;
                         $activerights = [];
@@ -115,17 +115,16 @@ class SiteController extends Controller
                         if(!empty($department)){
                             $session['department'] = $department->id;
                         }
-                        if($user->password_hash === Yii::$app->security->generatePasswordHash($user->email . $user->auth)){
-        
+                        if ($user->password_hash === Yii::$app->security->generatePasswordHash($user->email . $user->auth)) {
+
                             Yii::$app->session->setFlash('You are not secure. Please change your password.');
-                             return $this->redirect(['home/index']);
-                        } 
+                            return $this->redirect(['home/index']);
+                        }
                         return $this->redirect(['home/index']);
-                    }else {
+                    } else {
                         Yii::$app->session->setFlash('info', 'Please fill in your details.');
                         return $this->redirect(['role-status/create']);
                     }
-                    
                 }
                 $model->password = '';
                 $model->addError('password', 'Incorrect password.');

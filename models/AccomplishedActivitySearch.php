@@ -59,16 +59,17 @@ class AccomplishedActivitySearch extends AccomplishedActivity
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'achieved_score' => $this->achieved_score,
-            'initiative' => $this->initiative,
             'department' => $this->department,
+            /*
+            'initiative' => $this->initiative,
             'created_by' => $this->created_by,
             'created_at' => $this->created_at,
             'updated_by' => $this->updated_by,
             'updated_at' => $this->updated_at,
+            */
         ]);
 
-        $query->andFilterWhere(['like', 'reason_for_disparity', $this->reason_for_disparity]);
+        $query->andFilterWhere(['=', 'quarter', $this->quarter]);
 
         return $dataProvider;
     }

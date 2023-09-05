@@ -45,7 +45,7 @@ class AccomplishedActivity extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['achieved_score', 'color', 'initiative', 'kpi', 'strategic_objective', 'strategic_theme', 'department', 'created_by', 'created_at', 'updated_by', 'updated_at', 'quarter'], 'required'],
+            [['initiative', 'kpi', 'strategic_objective', 'strategic_theme', 'department', 'created_by', 'created_at', 'updated_by', 'updated_at', 'quarter'], 'required'],
             [['achieved_score', 'initiative', 'kpi', 'strategic_objective', 'strategic_theme', 'department', 'created_by', 'created_at', 'updated_by', 'updated_at', 'quarter'], 'integer'],
             [['reason_for_disparity'], 'string', 'max' => 1000],
             [['color'], 'string', 'max' => 10],
@@ -67,8 +67,8 @@ class AccomplishedActivity extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'achieved_score' => 'Achieved Score',
-            'color' => 'Color',
-            'reason_for_disparity' => 'Reason For Disparity',
+            'color' => 'Color Code',
+            'reason_for_disparity' => 'Comment',
             'initiative' => 'Initiative',
             'kpi' => 'Kpi',
             'strategic_objective' => 'Strategic Objective',

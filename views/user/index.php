@@ -61,19 +61,19 @@ $gridColumns = [
                      
             },
             'delete' => function ($url, $model) {
-                if($model->status == 8 || $model->status == 9) {
+                //if($model->status == 8 || $model->status == 9) {
                     return Html::a('<span class="fa fa-trash"></span>', Url::to(['user/delete', 'id' => $model->id]), [
                         'title' => 'Delete',
                         'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this user?'),
                         'data-method' => 'post',
                     ]);
-                } else if($model->status == 0) {
+                /*} else if($model->status == 0) {
                     return Html::a('<span class="fa fa-redo"></span>', Url::to(['user/restore', 'id' => $model->id]), [
                         'title' => 'Restore',
                         'data-confirm' => Yii::t('yii', 'Are you sure you want to restore this user?'),
                         'data-method' => 'post',
                     ]);
-                }
+                }*/
             },
         ],
         'template' => '{view} {update} {delete} {activate}'],
@@ -91,7 +91,7 @@ $gridColumns = [
                 'label' => 'Export',
                 'class' => 'btn btn-success'
             ],
-            'filename' => 'CMS - Users - '.date("d-m-Y"),
+            'filename' => 'University SDA Church - Users - '.date("d-m-Y"),
             'exportConfig' => [
                 ExportMenu::FORMAT_PDF => [
                     'pdfConfig' => [

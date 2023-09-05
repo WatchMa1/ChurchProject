@@ -77,22 +77,38 @@ class AccomplishedActivityController extends Controller
      * Lists all AccomplishedActivity models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($qt=null,$dept=null)
     {
+        
+        
+        
         if (User::userIsAllowedTo('Manage Department')) {
+            
+            if ($qt == null){
+                 Yii::$app->session->setFlash('error', 'Select the quarter you want.');
+                return $this->render('quarter-search', [ 
+                    
+                ]);
+            } else {
+                $qt = ((intval($qt) >= 1 && intval($qt) <= 4) || intval($qt)==1234) ? intval($qt) : 1;
+            }
             $session = Yii::$app->session;
             $department = $session['department'];
             $department = Department::findOne(['id' => $department]);
             
             $searchModel = new AccomplishedActivitySearch();
+            if (intval($qt)==1234){
+                $accomplishedActivities = AccomplishedActivity::findAll(['department' => $department->id]);
+            } else {
+                $accomplishedActivities = AccomplishedActivity::findAll(['department' => $department->id, 'quarter' => $qt]);
+            }
             
-            $accomplishedActivities = AccomplishedActivity::findAll(['department' => $department->id, 'status' => 9]);
             $initiatives = Initiative::findAll(['department_id' => $department->id, 'status' => 9]);
             $strategic_objectives = StrategicObjective::findAll(['department' => $department->id, 'status' => 9]);
             $strategic_themes = StrategicTheme::find()->asArray()->all();
             $KPIs = KPI::findAll(['department' => $department->id]);
 
-            if(!empty($accomplishedActivities)){
+            if(!empty($accomplishedActivities) ){
                  return $this->render('index',[ 
                     //'resource_persons' => $resource_persons,
                     //'responsible_persons' => $responsible_persons,
@@ -103,11 +119,66 @@ class AccomplishedActivityController extends Controller
                     'department' => $department,
                     'strategic_themes' => $strategic_themes,
                     'searchModel' => $searchModel,
+                    'qt' => $qt,
+                    'dept' => $department->id,
+    
                     //'scorecard' => array_merge($resource_persons, $responsible_persons, $initiatives, $strategic_objectives, $KPIs, $department, $strategic_themes)
                 ]);
             }
-            Yii::$app->session->setFlash('error', 'You have not reported anything yet. Click <b>Report an Activity</b> to start reporting...');
-            return $this->redirect(['department/']);
+            Yii::$app->session->setFlash('error', 'You have not reported anything in the selected quarter(s) yet. Click <b>Report an Activity</b> to start reporting...');
+            return $this->render('quarter-search',[ 
+                'value' => $qt
+                ]);
+        }
+        if (User::userIsAllowedTo('View Plans And Reports') || User::userIsAllowedTo('Manage Plans And Reports')) {
+            $session = Yii::$app->session;
+            
+            
+            $department = Department::findOne(['id' => $dept]);
+            
+            if ($qt == null || $dept==null || empty($department)){
+                 Yii::$app->session->setFlash('error', 'Select both the quarter and department.');
+                return $this->render('quarter-search',[ 
+                    
+                ]);
+            } else {
+                $qt = ((intval($qt) >= 1 && intval($qt) <= 4) || intval($qt)==1234) ? intval($qt) : 1;
+            }
+            
+            
+            $searchModel = new AccomplishedActivitySearch();
+            if (intval($qt)==1234){
+                $accomplishedActivities = AccomplishedActivity::findAll(['department' => $department->id]);
+            } else {
+                $accomplishedActivities = AccomplishedActivity::findAll(['department' => $department->id, 'quarter' => $qt]);
+            }
+            
+            $initiatives = Initiative::findAll(['department_id' => $department->id, 'status' => 9]);
+            $strategic_objectives = StrategicObjective::findAll(['department' => $department->id, 'status' => 9]);
+            $strategic_themes = StrategicTheme::find()->asArray()->all();
+            $KPIs = KPI::findAll(['department' => $department->id]);
+
+            if(!empty($accomplishedActivities) ){
+                 return $this->render('index',[ 
+                    //'resource_persons' => $resource_persons,
+                    //'responsible_persons' => $responsible_persons,
+                     'accomplishedActivities' => $accomplishedActivities,
+                    'initiatives' => $initiatives,
+                    'strategic_objectives' => $strategic_objectives,
+                    'KPIs' => $KPIs,
+                    'department' => $department,
+                    'strategic_themes' => $strategic_themes,
+                    'searchModel' => $searchModel,
+                    'qt' => $qt,
+                    'dept' => $department->id,
+                    //'scorecard' => array_merge($resource_persons, $responsible_persons, $initiatives, $strategic_objectives, $KPIs, $department, $strategic_themes)
+                ]);
+            }
+            Yii::$app->session->setFlash('error', 'Department has not reported anything in the selected quarter(s) yet.');
+            return $this->render('quarter-search',[ 
+                'value' => $qt,
+                'dept' => $dept
+                ]);
         }
         Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
         return $this->redirect(['home/']);
@@ -202,13 +273,13 @@ class AccomplishedActivityController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $model->status = 0;
-        
-        if($model->save()){
-            Yii::$app->session->setFlash('primary', 'Activity was deleted successfully.');
+
+        if($model->delete()){
+            Yii::$app->session->setFlash('success', 'Activity was deleted successfully.');
             return $this->redirect(['index']);
         }
-        Yii:$app->session->setFlash('error', 'Activity not deleted. Contact the Technical team for assistance.');
+        
+        Yii::$app->session->setFlash('error', 'Activity not deleted. Contact the Technical team for assistance.');
         return $this->redirect(['index']);
     }
 

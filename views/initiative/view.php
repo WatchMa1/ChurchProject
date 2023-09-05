@@ -30,12 +30,13 @@ $this->params['help'] = '<ul><li>Click <button class="btn btn-sm btn-primary">Up
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'activity',
-            'start_date',
-            'end_date',
+            'activity:ntext',
+            'start_date:date',
+            'end_date:date',
             'budget',
+            'responsible.fullName:ntext:Responsible Person',
+            'strategicObjective.objectives',
             'comments',
-            'strategic_objective',
         ],
     ]) ?>
 

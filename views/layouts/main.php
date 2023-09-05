@@ -15,10 +15,12 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\RoleStatus;
 use app\models\Department;
-
+use app\models\RightStatus;
+use app\models\Right;
 $user = User::findOne(User::getCurrentUserID());
 
 $session = Yii::$app->session;
+$userRole = $user->role;
 $name = $session['name'];
 $department = Department::findOne(['id' => $session['department']]);
 AppAsset::register($this);
@@ -161,6 +163,17 @@ AppAsset::register($this);
                         class="fas fa-clipboard-list" aria-hidden="true"></i> <span>Forms and Entries</span></a>
             </li>
             <?php } ?>
+            
+            <?php if (User::userIsAllowedTo('View Plans And Reports') || User::userIsAllowedTo('Manage Plans And Reports')) {?>
+            <li class="nav-item" id="department">
+                <a class="nav-link" id="manageDepartment" href="<?= Url::toRoute('accomplished-activity/index') ?>"><i
+                        class="fas fa-clipboard-list" aria-hidden="true"></i> <span>Department Report</span></a>
+            </li>
+            <?php }?>
+            
+            
+            
+            
             <?php if(User::userIsAllowedTo("Manage Department")){?>
             <li class="nav-item" id="department">
                 <a class="nav-link" id="department" href="<?= Url::toRoute('department-member/') ?>"><i
@@ -193,7 +206,7 @@ AppAsset::register($this);
             </li>
 
             <li class="nav-item" id="department">
-                <a class="nav-link" id="manageUser" href="<?= Url::toRoute('accomplished-activity/index') ?>"><i
+                <a class="nav-link" id="manageDepartment" href="<?= Url::toRoute('accomplished-activity/index') ?>"><i
                         class="fas fa-clipboard-list" aria-hidden="true"></i> <span>Department Report</span></a>
             </li>
 
@@ -256,6 +269,7 @@ AppAsset::register($this);
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="help" role="button" data-toggle="modal"
                                 data-target="#helpModal">
+                                
                                 <i class="fas fa-question fa-fw"></i>
                             </a>
                         </li>

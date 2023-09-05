@@ -335,6 +335,9 @@ JS;
 $this->registerJs($script);
 ?>
 <h1><?= Html::encode($this->title) ?></h1>
+<?php 
+    if (User::userIsAllowedTo('Manage Users') ) {
+?>
 <div class="row">
     <div class="col-xl-4 col-md-4 mb-4">
     <div class="card border-left-primary shadow h-100 py-2">
@@ -382,6 +385,9 @@ $this->registerJs($script);
         </div>
     </div>
 </div>
+<?php
+}?>
+
 <div class="row justify-content-center">
   <div class="card mx-4 col-md-12 shadow mb-4">
   <div class="">
@@ -433,7 +439,9 @@ $dataProvider = $searchModel->search(Yii::$app->request->queryParams,5);
       </div>
     </div>
 </div>
-
+<?php 
+    if (User::userIsAllowedTo('Manage Users') ) {
+?>
 <div class="row">
     <div class="col-xl-4 col-lg-4">
         <div class="card shadow mb-4">
@@ -642,3 +650,7 @@ $dataProvider = $searchModel->search(Yii::$app->request->queryParams,5);
         </div>
     </div>
 </div>
+<?php } ?>
+
+
+

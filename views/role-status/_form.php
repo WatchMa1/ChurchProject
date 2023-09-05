@@ -27,8 +27,8 @@ use app\models\Department;
         </div>
         <div class="form-group field-user-role">
            
-            <?= $form->field($model, 'role')->dropDownList(\yii\helpers\ArrayHelper::map(Role::find()->asArray()->all(),
-                'id', 'name'), ['prompt' => 'Select Role'])->label(false) ?>
+            <?php /* echo $form->field($model, 'role')->dropDownList(\yii\helpers\ArrayHelper::map(Role::find()->asArray()->all(),
+                'id', 'name'), ['prompt' => 'Select Role'])->label(false) */?>
                 
         </div>
     <div>

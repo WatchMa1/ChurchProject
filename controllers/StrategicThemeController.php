@@ -72,16 +72,16 @@ class StrategicThemeController extends Controller
             $model->updated_at = 0;
             $model->created_at = 0;
             $model->status = 9;
-            
-            if($model->save()){
+
+            if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Strategic Theme was successfully created.');
                 return $this->redirect(['index']);
             }
             Yii::$app->session->setFlash('error', 'Strategic Theme not was successfully created.');
         }
         return $this->render('create', [
-                    'model' => $model,
-                ]);
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -117,34 +117,37 @@ class StrategicThemeController extends Controller
             $model = $this->findModel($id);
             $model->status = 0;
 
-            
-            if($model->save()){
+
+            if ($model->save()) {
                 Yii::$app->session->setFlash('primary', 'Theme was deleted successfully.');
                 return $this->redirect(['index']);
             }
-            Yii:$app->session->setFlash('error', 'Theme not deleted. Contact the Technical team for assistance.');
+            Yii:
+            $app->session->setFlash('error', 'Theme not deleted. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
             return $this->redirect(['site/index']);
         }
     }
-    
-    
-    
+
+
+
     //Restores a deleted model 
     public function actionRestore($id)
     {
         if (User::userIsAllowedTo('Manage Strategic Plan')) {
             $model = $this->findModel($id);
-            $model->status = 9;
+            $this->$model->delete();
+
+            /* $model->status = 9;
 
             
             if($model->save()){
                 Yii::$app->session->setFlash('success', 'Theme was restored successfully.');
                 return $this->redirect(['index']);
-            }
-            Yii:$app->session->setFlash('error', 'Theme not restored. Contact the Technical team for assistance.');
+            } */
+            Yii::$app->session->setFlash('error', 'Theme not restored. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');

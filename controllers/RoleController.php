@@ -59,15 +59,15 @@ class RoleController extends Controller
     {
         $session = Yii::$app->session;
         if(!Yii::$app->user->isGuest){
-            if($session['role'] == 'Admin'){
+            if($session['role'] == '6'){
                 $searchModel = new RightStatusSearch();
-                $rightstatuses = RightStatus::findAll(['role' => $id, 'status' => 9]);
+                $rightstatuses = RightStatus::findAll(['role' => $id]);
         
                 $i = 0;
                 $activerights = [];
         
                 foreach($rightstatuses as $rightstatus){
-                    $activerights[$i] = Right::findOne(['id' => $rightstatus->right]);
+                    $activerights[] = Right::findOne(['id' => $rightstatus->right]);
                 }
                 $dataProvider = new ArrayDataProvider([
                     'allModels' => $activerights,

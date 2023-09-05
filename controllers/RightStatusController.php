@@ -76,7 +76,7 @@ class RightStatusController extends Controller
             $model->status = 9;
             
             if($model->save()){
-                return $this->redirect(['role\view', 'id' => $model->role]);
+                return $this->redirect(['role/view', 'id' => $model->role]);
             } else{
                 Yii::$app->session->setFlash('error', 'Right not added successfully.');
                 print_r($model->getErrors());

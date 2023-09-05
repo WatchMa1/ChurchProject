@@ -16,7 +16,9 @@ $this->params['help'] = '<ul><li>If the initiative is a one-day event, then the 
 
     <?= $this->render('_form', [
         'model' => $model,
-    'depmembers' => $depmembers,
+        'depmembers' => $depmembers,
+        'mydep' => $mydep
+
     ]) ?>
 
 </div>

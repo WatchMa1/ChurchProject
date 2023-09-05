@@ -116,6 +116,7 @@ class RoleStatusController extends Controller
                 $model->updated_at = 0;
                 $model->created_at = 0;
                 $model->status = 9;
+                $model->role = 1;
                 $model->user = $session['user'];
 
                 $user = User::findOne(['id' => $session['user']]);

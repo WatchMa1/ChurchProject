@@ -43,13 +43,13 @@ class KPIController extends Controller
             $session = Yii::$app->session;
             $department = $session['department'];
             $department = Department::findOne(['id' => $department]);
-            
+
             $searchModel = new KPISearch();
             $kpis = KPI::findAll(['department' => $department->id]);
 
-            if(empty($kpis)){
+            if (empty($kpis)) {
                 return $this->redirect('k-p-i/create');
-            }else{
+            } else {
                 return $this->render('index', [
                     'searchModel' => $searchModel,
                     'kpis' => $kpis,
@@ -57,8 +57,7 @@ class KPIController extends Controller
             }
         }
         Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
-            return $this->redirect(['site/index']);
-        
+        return $this->redirect(['site/index']);
     }
 
     /**
@@ -82,13 +81,13 @@ class KPIController extends Controller
     public function actionCreate()
     {
 
-         if (User::userIsAllowedTo('Manage Department')) {
+        if (User::userIsAllowedTo('Manage Department')) {
             $session = Yii::$app->session;
             $department = $session['department'];
             $department = Department::findOne(['id' => $department]);
             $strategic_objectives = StrategicObjective::findAll(['department' => $department->id]);
-             
-            if(!empty($strategic_objectives)){
+
+            if (!empty($strategic_objectives)) {
                 $model = new KPI();
                 if ($model->load(Yii::$app->request->post())) {
                     $model->department = $department->id;
@@ -97,7 +96,7 @@ class KPIController extends Controller
                     $model->updated_at = 0;
                     $model->created_at = 0;
                     $model->status = 9;
-                    if($model->save()){
+                    if ($model->save()) {
                         Yii::$app->session->setFlash('success',    'Department was successfully created.');
                         return $this->redirect(['index']);
                     }
@@ -106,11 +105,11 @@ class KPIController extends Controller
                 return $this->render('create', [
                     'model' => $model,
                 ]);
-            }else {
-            Yii::$app->session->setFlash('error', 'You have not created a strategic objective yet. Create one to begin filling in the Scorecard.');
-            return $this->redirect(['strategic-objective/create']);
+            } else {
+                Yii::$app->session->setFlash('error', 'You have not created a strategic objective yet. Create one to begin filling in the Scorecard.');
+                return $this->redirect(['strategic-objective/create']);
             }
-         }
+        }
     }
     /**
      * Updates an existing KPI model.
@@ -143,23 +142,24 @@ class KPIController extends Controller
     {
         if (User::userIsAllowedTo('Manage Department')) {
             $model = $this->findModel($id);
-            $model->status = 0;
+            $model->delete();
 
-            
-            if($model->save()){
+
+            /* if($model->save()){
                 Yii::$app->session->setFlash('primary', 'KPI was deleted successfully.');
                 return $this->redirect(['index']);
-            }
-            Yii:$app->session->setFlash('error', 'KPI not deleted. Contact the Technical team for assistance.');
+            } */
+            Yii:
+            $app->session->setFlash('error', 'KPI not deleted. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
             return $this->redirect(['site/index']);
         }
     }
-    
-    
-    
+
+
+
     //Restores a deleted model 
     public function actionRestore($id)
     {
@@ -167,12 +167,13 @@ class KPIController extends Controller
             $model = $this->findModel($id);
             $model->status = 9;
 
-            
-            if($model->save()){
+
+            if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'KPI was restored successfully.');
                 return $this->redirect(['index']);
             }
-            Yii:$app->session->setFlash('error', 'KPI not restored. Contact the Technical team for assistance.');
+            Yii:
+            $app->session->setFlash('error', 'KPI not restored. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');

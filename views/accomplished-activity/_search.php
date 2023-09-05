@@ -15,15 +15,7 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
-
-    <?= $form->field($model, 'achieved_score') ?>
-
-    <?= $form->field($model, 'reason_for_disparity') ?>
-
-    <?= $form->field($model, 'initiative') ?>
-
-    <?= $form->field($model, 'created_by') ?>
+    <?= $form->field($model, 'quarter')->dropDownList([1 => 'Quarter 1', 2 => 'Quarter 2', 3 => 'Quarter 3', 4 => 'Quarter 4'], ['prompt'=>'Please select the quarter....']);?>
 
     <?php // echo $form->field($model, 'created_at') ?>
 

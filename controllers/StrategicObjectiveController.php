@@ -23,7 +23,7 @@ class StrategicObjectiveController extends Controller
      */
     public function behaviors()
     {
-         return [
+        return [
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => ['index', 'create', 'update', 'delete', 'view', 'list'],
@@ -54,25 +54,25 @@ class StrategicObjectiveController extends Controller
             $session = Yii::$app->session;
             $department = $session['department'];
             $department = Department::findOne(['id' => $department]);
-            
-            $searchModel = new StrategicObjectiveSearch();
-			$objectives = StrategicObjective::findAll(['department' => $department->id]);
-            $dataProvider = new ArrayDataProvider([
-                                    'allModels' => $objectives,
-                                    'pagination' => [
-                                        'pageSize' => 10,
-                                    ],
-                                    'sort' => [
-                                        'attributes' => ['strategic_theme'],
-                                    ],
-                                ]);
 
-            if(empty($dataProvider)){
+            $searchModel = new StrategicObjectiveSearch();
+            $objectives = StrategicObjective::findAll(['department' => $department->id]);
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $objectives,
+                'pagination' => [
+                    'pageSize' => 10,
+                ],
+                'sort' => [
+                    'attributes' => ['strategic_theme'],
+                ],
+            ]);
+
+            if (empty($dataProvider)) {
                 return $this->redirect('create');
-            }else{
+            } else {
                 return $this->render('index', [
                     'searchModel' => $searchModel,
-                     'dataProvider' => $dataProvider
+                    'dataProvider' => $dataProvider
                 ]);
             }
         }
@@ -106,8 +106,8 @@ class StrategicObjectiveController extends Controller
             $session = Yii::$app->session;
             $department = $session['department'];
             $department = Department::findOne(['id' => $department]);
-            
-            
+
+
             if ($model->load(Yii::$app->request->post())) {
                 $model->department = $department->id;
                 $model->created_by = User::getCurrentUserID();
@@ -116,24 +116,23 @@ class StrategicObjectiveController extends Controller
                 $model->created_at = 0;
                 $model->status = 9;
 
-                
-                if($model->save()){
+
+                if ($model->save()) {
                     Yii::$app->session->setFlash('success', 'Objective was successfully created.');
                     return $this->redirect(['index']);
                 }
                 Yii::$app->session->setFlash('error', 'Ojective was not successfully created.');
                 var_dump($model->getErrors());
             }
-            
+
 
             return $this->render('create', [
                 'model' => $model,
             ]);
-        }else {
+        } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
             return $this->redirect(['home/index']);
         }
-        
     }
 
     /**
@@ -148,7 +147,7 @@ class StrategicObjectiveController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-             return $this->redirect(['index']);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
@@ -167,23 +166,24 @@ class StrategicObjectiveController extends Controller
     {
         if (User::userIsAllowedTo('Manage Department')) {
             $model = $this->findModel($id);
-            $model->status = 0;
+            $model->delete();
+            /* $model->status = 0;
 
             
             if($model->save()){
                 Yii::$app->session->setFlash('primary', 'Objective was deleted successfully.');
                 return $this->redirect(['index']);
-            }
-            Yii:$app->session->setFlash('error', 'Objective not deleted. Contact the Technical team for assistance.');
+            } */
+            Yii::$app->session->setFlash('error', 'Objective not deleted. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');
             return $this->redirect(['site/index']);
         }
     }
-    
-    
-    
+
+
+
     //Restores a deleted model 
     public function actionRestore($id)
     {
@@ -191,12 +191,13 @@ class StrategicObjectiveController extends Controller
             $model = $this->findModel($id);
             $model->status = 9;
 
-            
-            if($model->save()){
+
+            if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Objective was restored successfully.');
                 return $this->redirect(['index']);
             }
-            Yii:$app->session->setFlash('error', 'Objective was not restored. Contact the Technical team for assistance.');
+            Yii:
+            $app->session->setFlash('error', 'Objective was not restored. Contact the Technical team for assistance.');
             return $this->redirect(['index']);
         } else {
             Yii::$app->session->setFlash('error', 'You are not authorised to perform that action.');

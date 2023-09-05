@@ -44,7 +44,7 @@ class UserController extends Controller
             ],
         ]);
     }
-    
+
     /** 
      * Lists all User models.
      * @return mixed
@@ -86,28 +86,28 @@ class UserController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $rolestatus->load(Yii::$app->request->post())) {
             $user = User::findByEmail($model->email);
-            if(empty($user)){
+            if (empty($user)) {
                 $model->status = User::STATUS_INACTIVE;
                 $model->auth = Yii::$app->security->generateRandomString();
-                $model->password_hash = Yii::$app->getSecurity()->generatePasswordHash($model->email.$model->auth);
+                $model->password_hash = Yii::$app->getSecurity()->generatePasswordHash($model->email . $model->auth);
                 //$model->updated_by = Yii::$app->user->identity->id;
                 $model->updated_by = 1;
-            
-                if($model->save() && $rolestatus->load(Yii::$app->request->post())) {                
+
+                if ($model->save() && $rolestatus->load(Yii::$app->request->post())) {
                     $rolestatus->role = $model->role;
                     $rolestatus->user = $model->id;
                     $rolestatus->created_by = Yii::$app->user->identity->id;
                     $rolestatus->updated_by = Yii::$app->user->identity->id;
                     $rolestatus->updated_at = 0;
                     $rolestatus->created_at = 0;
-                
-				    //$rolestatus->id = 1;
-                
-                    if($rolestatus->save()){
-                        Mail::sendMail($model->email, $model->email, $model);
+
+                    //$rolestatus->id = 1;
+
+                    if ($rolestatus->save()) {
+                        //Mail::sendMail($model->email, $model->email, $model);
                         Yii::$app->session->setFlash('success', 'User account was successfully created.');
                         return $this->redirect(['index']);
-                    } else{
+                    } else {
                         //print_r($rolestatus->getErrors());
                         Yii::$app->session->setFlash('error', "User account created but Role Status not saved!");
                     }
@@ -123,7 +123,7 @@ class UserController extends Controller
             'rolestatus' => $rolestatus,
         ]);
     }
-    
+
 
     public function actionGuestCreate()
     {
@@ -132,22 +132,23 @@ class UserController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->status = User::STATUS_INACTIVE;
             $model->auth = Yii::$app->security->generateRandomString();
-            $model->password_hash = Yii::$app->getSecurity()->generatePasswordHash($model->email.$model->auth);
+            $model->password_hash = Yii::$app->getSecurity()->generatePasswordHash($model->email . $model->auth);
             $model->updated_by = 1;
             $model->role = 1;
-        
-            if($model->save()) {             
-                if(Mail::sendMail($model->email, $model->email, $model)){
+
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'User account succefully created.');
+                return $this->redirect(['site/index']);
+                /* if(Mail::sendMail($model->email, $model->email, $model)){
                     Yii::$app->session->setFlash('success', 'User account succefully created.');
                     return $this->redirect(['site/index']);
                 } else {
                     Yii::$app->session->setFlash('error', 'User account created but mail with user credentials was not sent. Please contact the Admin for assistance.');
                     return $this->redirect(['site/index']);
-                }
+                } */
             } else {
-                var_dump($model->getErrors());
+                //var_dump($model->getErrors());
                 Yii::$app->session->setFlash('error', "User account created but email not sent!");
-
             }
         }
         $this->layout = 'main2';
@@ -155,27 +156,29 @@ class UserController extends Controller
             'model' => $model,
         ]);
     }
-    
-    
+
+
     //This function activates a user account
-    public function actionActivateUser($id){
+    public function actionActivateUser($id)
+    {
         $model = User::findOne($id);
         $model->status = 9;
-        if($model->save()){
+        if ($model->save()) {
             Mail::sendActivationMail($model->email, $model->email, $model);
             Yii::$app->session->setFlash('success', 'Account successfully activated.');
-            
+
             return $this->redirect(['index']);
         }
         Yii::$app->session->setFlash('error', 'Sorry. Account not activated successfully.');
         return $this->redirect(['index']);
     }
-    
-    
+
+
     //This function activates all inactive user accounts
-    public function actionActivateUsers(){
+    public function actionActivateUsers()
+    {
         $users = User::findAll(['status' => 8]);
-        foreach ($users as $user){
+        foreach ($users as $user) {
             User::activateUser($user->id);
         }
         Yii::$app->session->setFlash('success', 'All accounts were activated.');
@@ -192,11 +195,11 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-	    $rolestatus = Rolestatus::findOne(['user' => $id]);
+        $rolestatus = Rolestatus::findOne(['user' => $id]);
 
         if ($model->load(Yii::$app->request->post()) && $rolestatus->load(Yii::$app->request->post())) {
             $model->role = $rolestatus->role;
-            if($model->save() && $rolestatus->save()){
+            if ($model->save() && $rolestatus->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             Yii::$app->session->setFlash('error', 'Sorry, the changes were not succefully made.');
@@ -205,13 +208,13 @@ class UserController extends Controller
 
         return $this->render('update', [
             'model' => $model,
-	        'rolestatus' => $rolestatus,
+            'rolestatus' => $rolestatus,
         ]);
     }
-    
-    
-    
-    
+
+
+
+
 
     /**
      * Deletes an existing User model.
@@ -222,12 +225,12 @@ class UserController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        if($model->status == 0) {
-            Yii::$app->session->setFlash('error', "User account has already been deleted!");
-        } else {
-            $model->status = 0;
-            $model->save();
+        if ($model->delete()) {
             Yii::$app->session->setFlash('success', "User account has been deleted!");
+        } else {
+            //$model->status = 0;
+            //$model->save();
+            Yii::$app->session->setFlash('error', "User account deletion failed!");
         }
         return $this->redirect(['index']);
     }
@@ -241,10 +244,10 @@ class UserController extends Controller
     public function actionRestore($id)
     {
         $model = $this->findModel($id);
-        if($model->status == 8 || $model->status == 9) {
+        if ($model->status == 8 || $model->status == 9) {
             Yii::$app->session->setFlash('error', "User account has already been restored!");
         } else {
-            if($model->validatePassword($model->email)) {
+            if ($model->validatePassword($model->email)) {
                 $model->status = 8;
                 //send email
             } else {
@@ -257,9 +260,9 @@ class UserController extends Controller
         return $this->redirect(['index']);
     }
 
-    
-    
-     /**
+
+
+    /**
      * Deactivates an existing User model.
      * @param $id
      * @return \yii\web\Response
@@ -268,7 +271,7 @@ class UserController extends Controller
     public function actionDeactivate($id)
     {
         $model = $this->findModel($id);
-        if($model->status == 8) {
+        if ($model->status == 8) {
             Yii::$app->session->setFlash('error', "User account has already been Deactivated!");
         } else {
             $model->status = User::STATUS_INACTIVE;
@@ -292,36 +295,38 @@ class UserController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    
-    public function actionDepartment() {
+
+    public function actionDepartment()
+    {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
             $parents = $_POST['depdrop_parents'];
             if ($parents != null) {
                 $id = $parents[0];
-                if($id = 2 || $id = 3 || $id = 4){
+                if ($id = 2 || $id = 3 || $id = 4) {
                     $out = Department::findAll()->orderBy(['name' => SORT_ASC]);
-                    return ['output'=>$out, 'selected'=>''];
+                    return ['output' => $out, 'selected' => ''];
                 }
             }
-            return ['output'=>'', 'selected'=>'No parents'];
+            return ['output' => '', 'selected' => 'No parents'];
         }
-        return ['output'=>'', 'selected'=>'No parents'];
+        return ['output' => '', 'selected' => 'No parents'];
     }
-    
-    
-    public function actionDepartments() {
+
+
+    public function actionDepartments()
+    {
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
             $parents = $_POST['depdrop_parents'];
             if ($parents != null) {
                 $role = $parents[0];
-                if(Role::findOne(['id' => $role])->name == "Departmental Head"){
-                    $departments = Department::find()->where(['status'=> 9])->orderBy(['name' => SORT_ASC])->all();
+                if (Role::findOne(['id' => $role])->name == "Departmental Head") {
+                    $departments = Department::find()->where(['status' => 9])->orderBy(['name' => SORT_ASC])->all();
                     $out = [];
                     $i = 0;
-                    foreach($departments as $department){
+                    foreach ($departments as $department) {
                         $out[$i] = ['id' => $department->id, 'name' => $department->name];
                         $i = $i + 1;
                     }
@@ -332,13 +337,13 @@ class UserController extends Controller
                     // ['id'=>'<sub-cat_id_2>', 'name'=>'<sub-cat-name2>']
                     // ]
 
-                    echo Json::encode(['output'=>$out, 'selected'=> '']);
-		            return;
+                    echo Json::encode(['output' => $out, 'selected' => '']);
+                    return;
                 }
-                return ['output'=>'', 'selected'=>'No parents'];
+                return ['output' => '', 'selected' => 'No parents'];
             }
-            return ['output'=>'', 'selected'=>'No parents'];
+            return ['output' => '', 'selected' => 'No parents'];
         }
-        return ['output'=>'', 'selected'=>''];
+        return ['output' => '', 'selected' => ''];
     }
 }

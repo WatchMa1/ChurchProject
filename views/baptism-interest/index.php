@@ -35,7 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at:date',
             //'updated_at',
 
-            ['class' => 'yii\grid\ActionColumn', 'header' => 'Action', 'headerOptions' => ['style' => 'width:130px'],
+            [
+                'class' => 'yii\grid\ActionColumn', 'header' => 'Action', 'headerOptions' => ['style' => 'width:130px'],
                 'buttons'  => [
                     'view' => function ($url, $model) {
                         return Html::a('<span class="fa fa-eye btn btn-sm btn-secondary"></span>', ['baptism-interest/view', 'id' => $model->id],
@@ -57,7 +58,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }, 
                 ],
-                'template' => '{view} {update} {delete} '],['class' => 'yii\grid\ActionColumn'],
+                'template' => '{view} {update} {delete} '],['class' => 'yii\grid\ActionColumn'
+            ],
        
         ],
     ]); ?>

@@ -6,6 +6,8 @@ use yii\helpers\Html;
 /* @var $model app\models\AccomplishedActivity */
 
 $this->title = 'Report an Activity';
+$this->params['breadcrumbs'][] = ['label' => 'Accomplished Activities', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="accomplished-activity-create" align="center">
 

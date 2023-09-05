@@ -23,17 +23,17 @@ class HomeController extends Controller
                 return $this->redirect(['member/create']);
             }
             //return $this->redirect(['family/create']);
-        }
-        else if(User::userIsAllowedTo('Manage Department')){
+        } else if (User::userIsAllowedTo('Manage Department')) {
+            //To be commented out
             if (!isset(Yii::$app->session['family'])) {
                 return $this->redirect(['family/create']);
             } else if (!isset(Yii::$app->session['member'])) {
                 return $this->redirect(['member/create']);
             }
             return $this->redirect(['department/']);
-        } else if(Yii::$app->user->isGuest){
-			return $this->goHome();
-		}
+        } else if (Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
 
         return $this->render('index');
     }

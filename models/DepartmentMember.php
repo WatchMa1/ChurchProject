@@ -65,7 +65,7 @@ class DepartmentMember extends \yii\db\ActiveRecord
         ];
     }
 
-     /**
+    /**
      * {@inheritdoc}
      */
     public function behaviors()
@@ -99,8 +99,13 @@ class DepartmentMember extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Member::className(), ['id' => 'member']);
     }
-    
-    public function getName0(){
+
+    public function getName0()
+    {
         return Member::findOne(['id' => $this->member0])->getFullName();
+    }
+    public function getFullName()
+    {
+        return Member::findOne($this->member)->fullName;
     }
 }
